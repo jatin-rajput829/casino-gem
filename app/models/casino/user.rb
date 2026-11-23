@@ -12,7 +12,7 @@ class CASino::User < ActiveRecord::Base
 
   def two_factor_enabled?
     values = extra_attributes || {}
-    value = values['two_factor_enabled'] || values[:two_factor_enabled]
-    value == true || value.to_s == '1'
+    value =  values[:two_factor_enabled]
+    value == true
   end
 end
