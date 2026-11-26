@@ -3,6 +3,12 @@ require 'casino/engine'
 
 module CASino
   include ActiveSupport::Configurable
+  mattr_accessor :app_user_class_name
+  self.app_user_class_name = "User"
+
+  def self.app_user_class
+    app_user_class_name.constantize
+  end
 
   defaults = {
     authenticators: HashWithIndifferentAccess.new,
@@ -10,6 +16,7 @@ module CASino
     logger: Rails.logger,
     frontend: HashWithIndifferentAccess.new(
       sso_name: 'CASino',
+      sso_issuer: 'CASINO (CFM)',
       footer_text: 'Powered by <a href="http://rbcas.com/">CASino</a>'
     ),
     implementors: HashWithIndifferentAccess.new(
