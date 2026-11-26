@@ -16,7 +16,7 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
 
   def create
     @two_factor_authenticator = current_user.two_factor_authenticators.where(id: params[:id]).first
-    if @two_factor_authenticator && TwoFactorOtpVerifier.verify!(current_user, @two_factor_authenticator, params[:otp], allow_inactive: true)
+    if @two_factor_authenticator && CASino::TwoFactorOtpVerifier.verify!(current_user, @two_factor_authenticator, params[:otp], allow_inactive: true)
       current_user.with_lock do
         current_ticket = current_ticket_granting_ticket
         current_user.ticket_granting_tickets.where.not(id: current_ticket.id).destroy_all
@@ -35,7 +35,7 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
 
   def destroy
     authenticator = current_user.two_factor_authenticators.where(id: params[:id], active: true).first
-    if authenticator && TwoFactorOtpVerifier.verify!(current_user, authenticator, params[:otp])
+    if authenticator && CASino::TwoFactorOtpVerifier.verify!(current_user, authenticator, params[:otp])
       current_user.with_lock do
         # Disable flag first so concurrent requests never see (enabled: true, authenticator: nil)
         update_two_factor_enabled(false)

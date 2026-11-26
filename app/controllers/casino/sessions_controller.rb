@@ -58,7 +58,7 @@ class CASino::SessionsController < CASino::ApplicationController
     user.with_lock do
       @ticket_granting_ticket.reload
       if @ticket_granting_ticket.awaiting_two_factor_authentication? && !@ticket_granting_ticket.expired? &&
-         ::TwoFactorOtpVerifier.verify!(user, user.active_two_factor_authenticator, params[:otp])
+         CASino::TwoFactorOtpVerifier.verify!(user, user.active_two_factor_authenticator, params[:otp])
         @ticket_granting_ticket.update!(awaiting_two_factor_authentication: false, two_factor_verified_at: Time.current)
         verified = true
       end

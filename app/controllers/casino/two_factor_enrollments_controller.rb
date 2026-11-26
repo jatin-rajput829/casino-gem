@@ -28,7 +28,7 @@ class CASino::TwoFactorEnrollmentsController < CASino::ApplicationController
       authenticator = pending_authenticator
       if @ticket_granting_ticket.awaiting_two_factor_authentication? && !@ticket_granting_ticket.expired? &&
         authenticator && pending_user.active_two_factor_authenticator.nil? &&
-         ::TwoFactorOtpVerifier.verify!(pending_user, authenticator, params[:otp], allow_inactive: true)
+         CASino::TwoFactorOtpVerifier.verify!(pending_user, authenticator, params[:otp], allow_inactive: true)
         authenticator.update!(active: true)
         @ticket_granting_ticket.update!(awaiting_two_factor_authentication: false, two_factor_verified_at: Time.current)
         verified = true
