@@ -1,3 +1,6 @@
+<% timeout_seconds = CASino.config.two_factor_authenticator[:timeout].to_i %>
+<% expires_at = @two_factor_authenticator.created_at + timeout_seconds.seconds %>
+
 <div class="container">
   <div class="twofactor box">
     <%= render 'messages' %>
@@ -13,6 +16,9 @@
       <div id="qr-code">
         <img src="<%= otp_qr_code_data_url(@two_factor_authenticator) %>" height="250" width="250"><br />
       </div>
+      <p id="qr-countdown" data-expires-at="<%= expires_at.to_i %>">
+        Expires in <strong id="qr-timer"><%= format('%02d:%02d', timeout_seconds / 60, timeout_seconds % 60) %></strong>
+      </p>
       <p id="secret">
         <%= t('two_factor_authenticators.secret') %>:
         <a href="<%= otp_auth_url(@two_factor_authenticator) %>">
@@ -26,8 +32,8 @@
         <%= hidden_field_tag :id, @two_factor_authenticator.id %>
         <%= label_tag :code, t('two_factor_authenticators.code') %>
         <%= text_field_tag :otp, nil, maxlength: 6, autofocus: true, autocomplete: 'off' %>
-        <%= link_to t('two_factor_authenticators.cancel'), sessions_path, :class => 'secondary button' %>
         <%= button_tag t('two_factor_authenticators.submit'), :class => 'button' %>
+        <%= link_to t('two_factor_authenticators.cancel'), sessions_path, :class => 'secondary button' %>
       <% end %>
     </div>
   </div>
