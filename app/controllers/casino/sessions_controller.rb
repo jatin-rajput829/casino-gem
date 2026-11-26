@@ -65,6 +65,7 @@ class CASino::SessionsController < CASino::ApplicationController
     end
 
     unless verified
+      create_login_attempt(user, false)
       flash.now[:error] = I18n.t('validate_otp.invalid_otp')
       return render 'casino/sessions/validate_otp', status: :forbidden
     end

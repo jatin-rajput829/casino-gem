@@ -37,8 +37,14 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
     authenticator = current_user.two_factor_authenticators.where(id: params[:id], active: true).first
     if authenticator && TwoFactorOtpVerifier.verify!(current_user, authenticator, params[:otp])
       current_user.with_lock do
-        authenticator.destroy!
+        # Disable flag first so concurrent requests never see (enabled: true, authenticator: nil)
         update_two_factor_enabled(false)
+        authenticator.destroy!
+        current_ticket = current_ticket_granting_ticket
+        current_ticket.update_columns(two_factor_verified_at: nil)
+
+        # Revoke all other sessions when lowering account security (triggers SLO post-commit)
+        current_user.ticket_granting_tickets.where.not(id: current_ticket.id).destroy_all
       end
       flash[:notice] = I18n.t('two_factor_authenticators.successfully_deleted')
     else
@@ -50,9 +56,9 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
   private
 
   def update_two_factor_enabled(enabled)
-    attributes = (current_user.extra_attributes || {}).merge('two_factor_enabled' => enabled)
+    attributes = (current_user.extra_attributes || {}).merge(:two_factor_enabled => enabled)
     current_user.update!(extra_attributes: attributes)
-    User.where(email: current_user.username).update_all(two_factor_enabled: enabled)
+    CASino.app_user_class.where(email: current_user.username).update_all(two_factor_enabled: enabled)
   end
 
   def disable_caching

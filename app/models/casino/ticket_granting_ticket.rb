@@ -11,6 +11,9 @@ class CASino::TicketGrantingTicket < ActiveRecord::Base
 
   scope :active, -> { where(awaiting_two_factor_authentication: false).order('updated_at DESC') }
 
+  # Optional: Configure maximum age for a 2FA verification (nil = valid for entire TGT lifetime)
+  TWO_FACTOR_VERIFICATION_TTL = nil # e.g., 24.hours
+
   def self.cleanup(user = nil)
     if user.nil?
       base = self
@@ -37,14 +40,29 @@ class CASino::TicketGrantingTicket < ActiveRecord::Base
     end
   end
 
+  # Determines whether this ticket satisfies all primary and two-factor authentication requirements to mint Service Tickets.
   def two_factor_authenticated?
-    return false if awaiting_two_factor_authentication? || expired? || user.nil?
+    return false unless ticket_active?
+    return true unless two_factor_required?
 
-    has_authenticator = user.active_two_factor_authenticator.present?
-    return false if user.two_factor_enabled? && !has_authenticator
+    two_factor_verification_valid?
+  end
 
-    requires_two_factor = user.two_factor_enabled? || has_authenticator
-    !requires_two_factor || two_factor_verified_at.present?
+  def ticket_active?
+    return false if expired? || awaiting_two_factor_authentication? || user.nil?
+
+    true
+  end
+
+  def two_factor_required?
+    user.two_factor_enabled? || user.active_two_factor_authenticator.present?
+  end
+
+  def two_factor_verification_valid?
+    return false if two_factor_verified_at.blank?
+    return true if TWO_FACTOR_VERIFICATION_TTL.nil?
+
+    two_factor_verified_at >= TWO_FACTOR_VERIFICATION_TTL.ago
   end
 
   def expired?

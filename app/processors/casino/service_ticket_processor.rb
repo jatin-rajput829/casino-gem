@@ -85,7 +85,7 @@ module CASino::ServiceTicketProcessor
       Rails.logger.debug 'Consumed service or proxy ticket'
     end
     if result.success?
-      Rails.logger.info 'Service or proxy ticket successfully validated'
+      Rails.logger.info "Service #{service} or proxy ticket successfully validated"
     else
       Rails.logger.send(result.error_severity, result.error_message)
     end
@@ -102,7 +102,7 @@ module CASino::ServiceTicketProcessor
     elsif ticket.expired?
       ValidationResult.new 'INVALID_TICKET', 'Ticket has expired', :warn
     elsif service != ticket.service
-      ValidationResult.new 'INVALID_SERVICE', 'Ticket is not valid for the requested service', :warn
+      ValidationResult.new 'INVALID_SERVICE', "Ticket is not valid for the requested service #{service}", :warn
     elsif options[:renew] && !ticket.issued_from_credentials?
       ValidationResult.new 'INVALID_TICKET', 'Service requires a ticket issued from credentials', :info
     else

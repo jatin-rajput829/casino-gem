@@ -6,8 +6,12 @@ class CASino::ServiceTicket < ActiveRecord::Base
   self.ticket_prefix = 'ST'.freeze
 
   belongs_to :ticket_granting_ticket
-  before_destroy :send_single_sign_out_notification, if: :consumed?
   has_many :proxy_granting_tickets, as: :granter, dependent: :destroy
+
+  # Send single sign-out HTTP notifications after the transaction commits so we don't
+  # hold row locks (e.g., inside `user.with_lock`) during slow external network requests,
+  # and to avoid firing notifications if the transaction rolls back.
+  after_commit :send_single_sign_out_notification, on: :destroy, if: :consumed?
 
   def self.cleanup_unconsumed
     self.delete_all(['created_at < ? AND consumed = ?', CASino.config.service_ticket[:lifetime_unconsumed].seconds.ago, false])

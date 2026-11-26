@@ -29,14 +29,14 @@ module CASino::TicketGrantingTicketProcessor
     user_data = authentication_result[:user_data]
     user = load_or_initialize_user(authentication_result[:authenticator], user_data[:username], user_data[:extra_attributes])
     cleanup_expired_ticket_granting_tickets(user)
-    requires_two_factor = user.two_factor_enabled? || user.active_two_factor_authenticator.present?
+    two_factor_verified_this_login = user.two_factor_enabled? || user.active_two_factor_authenticator.present?
     ticket_attributes = {
-      awaiting_two_factor_authentication: requires_two_factor,
+      awaiting_two_factor_authentication: two_factor_verified_this_login,
       user_agent: user_agent,
       user_ip: user_ip,
       long_term: !!options[:long_term]
     }
-    ticket_attributes[:two_factor_verified_at] = Time.current unless requires_two_factor
+    ticket_attributes[:two_factor_verified_at] = Time.current if two_factor_verified_this_login
     user.ticket_granting_tickets.create!(ticket_attributes)
   end
 
