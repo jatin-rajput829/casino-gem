@@ -4,6 +4,7 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
   include CASino::SessionsHelper
   include CASino::TwoFactorAuthenticatorsHelper
   include CASino::TwoFactorAuthenticatorProcessor
+  include CASino::ControllerConcern::RescuesInvalidAuthenticityToken
 
   before_action :ensure_signed_in
   before_action :disable_caching
@@ -15,9 +16,22 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
   end
 
   def create
-    @two_factor_authenticator = current_user.two_factor_authenticators.where(id: params[:id]).first
+    @two_factor_authenticator = current_user.two_factor_authenticators.where(id: params[:id], active: false).first
     if @two_factor_authenticator && CASino::TwoFactorOtpVerifier.verify!(current_user, @two_factor_authenticator, params[:otp], allow_inactive: true)
+      already_active = false
+
       current_user.with_lock do
+        if current_user.two_factor_authenticators.where(active: true).exists?
+          already_active = true
+          next
+        end
+
+        @two_factor_authenticator.reload
+        if @two_factor_authenticator.active?
+          already_active = true
+          next
+        end
+
         current_ticket = current_ticket_granting_ticket
         current_user.ticket_granting_tickets.where.not(id: current_ticket.id).destroy_all
         current_ticket.service_tickets.destroy_all
@@ -25,6 +39,13 @@ class CASino::TwoFactorAuthenticatorsController < CASino::ApplicationController
         update_two_factor_enabled(true)
         current_ticket.update!(two_factor_verified_at: Time.current)
       end
+
+      if already_active
+        flash[:notice] = I18n.t('two_factor_authenticators.successfully_activated')
+        redirect_to sessions_path
+        return
+      end
+
       flash[:notice] = I18n.t('two_factor_authenticators.successfully_activated')
       redirect_to sessions_path
     else

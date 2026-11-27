@@ -3,6 +3,8 @@ require 'rotp'
 class CASino::TwoFactorEnrollmentsController < CASino::ApplicationController
   include CASino::SessionsHelper
   include CASino::TwoFactorAuthenticatorsHelper
+  include CASino::ControllerConcern::RescuesInvalidAuthenticityToken
+
   helper CASino::TwoFactorAuthenticatorsHelper
 
   before_action :load_pending_two_factor_ticket
