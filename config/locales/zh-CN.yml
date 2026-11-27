@@ -46,6 +46,7 @@ zh-CN:
     code: "确认码"
     submit: "验证并开启"
     invalid_one_time_password: "一次性密码不正确"
+    invalid_authenticator_code: "验证器代码无效或不可用。"
     invalid_two_factor_authenticator: "两步验证已经失效，请按照下面的指示："
     successfully_activated: "两步验证已经关联到此账户。"
     successfully_deleted: "两步验证已经删除。"

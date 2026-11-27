@@ -48,6 +48,7 @@ nb:
     code: "Bekreftelseskode"
     submit: "Bekreft og slå på"
     invalid_one_time_password: "Engangspassordet var feil."
+    invalid_authenticator_code: "Autentiseringskoden er ugyldig eller utilgjengelig."
     invalid_two_factor_authenticator: "Tofaktorautentiseringen har utløpt. Følg instruksjonene nedenfor."
     successfully_activated: "Denne kontoen bruker nå tofaktorautentisering."
     successfully_deleted: "Tofaktorautentiseringen er nå slettet."

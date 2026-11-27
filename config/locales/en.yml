@@ -49,6 +49,7 @@ en:
     code: "Confirmation code"
     submit: "Verify and enable"
     invalid_one_time_password: "The one-time password was not correct."
+    invalid_authenticator_code: "The authenticator code is invalid or unavailable."
     invalid_two_factor_authenticator: "The two-factor authenticator expired. Please follow the instructions below."
     successfully_activated: "The two-factor authenticator is now linked to this account."
     successfully_deleted: "The two-factor authenticator was successfully deleted."

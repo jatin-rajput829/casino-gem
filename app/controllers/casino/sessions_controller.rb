@@ -2,6 +2,7 @@ class CASino::SessionsController < CASino::ApplicationController
   include CASino::SessionsHelper
   include CASino::AuthenticationProcessor
   include CASino::TwoFactorAuthenticatorProcessor
+  include CASino::ControllerConcern::RescuesInvalidAuthenticityToken
 
   before_action :validate_login_ticket, only: [:create]
   before_action :ensure_service_allowed, only: [:new, :create]

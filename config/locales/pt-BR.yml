@@ -46,6 +46,7 @@ pt-BR:
     code: "Código de confirmação"
     submit: "Verificar e ativar"
     invalid_one_time_password: "A senha única está incorreta."
+    invalid_authenticator_code: "O código do autenticador é inválido ou está indisponível."
     invalid_two_factor_authenticator: "A autenticação dupla expirou. Por favor, siga as instruções baixo."
     successfully_activated: "A autenticação dupla está habilitada para essa conta."
     successfully_deleted: "A autenticação dupla foi excluída com sucesso."

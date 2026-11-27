@@ -46,6 +46,7 @@ ar:
     code: "كود التأكيد"
     submit: "تأكيد وتفعيل"
     invalid_one_time_password: "لم تكن كلمة مرور المرّة الواحدة صحيحة."
+    invalid_authenticator_code: "رمز المصادقة غير صالح أو غير متوفر."
     invalid_two_factor_authenticator: "انتهت صلاحية المُوثّق الثنائي. فضلًا اتبع التعليمات التالية."
     successfully_activated: "أصبح المُوثّق الثنائي مرتبطًا مع هذا الحساب."
     successfully_deleted: "حُذف المُوثّق الثنائي بنجاح."

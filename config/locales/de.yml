@@ -48,6 +48,7 @@ de:
     code: "Bestätigungs-Code"
     submit: "Verifizieren und aktivieren"
     invalid_one_time_password: "Das eingegebene Einmalkennwort ist ungültig."
+    invalid_authenticator_code: "Der Authentifizierungscode ist ungültig oder nicht verfügbar."
     invalid_two_factor_authenticator: "Der Zwei-Faktor-Authentifizierer ist abgelaufen. Bitte folgen Sie den untenstehenden Schritten."
     successfully_activated: "Der Zwei-Faktor-Authentifizierer ist jetzt mit Ihrem Account verknüpft."
     successfully_deleted: "Der Zwei-Faktor-Authentifizierer wurde erfolgreich gelöscht."

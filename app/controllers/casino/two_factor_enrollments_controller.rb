@@ -39,7 +39,7 @@ class CASino::TwoFactorEnrollmentsController < CASino::ApplicationController
 
     @two_factor_authenticator = pending_authenticator
     @two_factor_authenticator = nil if @two_factor_authenticator && @two_factor_authenticator.expired?
-    flash.now[:error] = 'The authenticator code is invalid or unavailable.'
+    flash.now[:error] = I18n.t('two_factor_authenticators.invalid_authenticator_code')
     render :new, status: :forbidden
   end
 

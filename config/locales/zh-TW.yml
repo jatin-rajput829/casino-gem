@@ -46,6 +46,7 @@ zh-TW:
     code: "確認碼"
     submit: "驗證並開啟"
     invalid_one_time_password: "一次性密碼不正確"
+    invalid_authenticator_code: "驗證器代碼無效或無法使用。"
     invalid_two_factor_authenticator: "兩步驗證已經失效，請按照下面的指示："
     successfully_activated: "兩步驗證已經關聯到此賬戶。"
     successfully_deleted: "兩步驗證已經刪除。"
