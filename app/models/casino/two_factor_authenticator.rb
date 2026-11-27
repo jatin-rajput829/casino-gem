@@ -4,6 +4,10 @@ class CASino::TwoFactorAuthenticator < ActiveRecord::Base
 
   scope :active, -> { where(active: true) }
 
+  ENCRYPTION_SALT = 'casino two factor encryption v1'.freeze
+  SIGNING_SALT    = 'casino two factor signing v1'.freeze
+  KEY_LENGTH      = 32
+
   def secret
     stored_secret = self[:secret]
     return stored_secret unless stored_secret && stored_secret.start_with?('v1:')
@@ -16,11 +20,29 @@ class CASino::TwoFactorAuthenticator < ActiveRecord::Base
   end
 
   def self.secret_encryptor
-    key_generator = Rails.application.key_generator
-    encryption_key = key_generator.generate_key('casino two factor encryption v1', 32)
-    signing_key = key_generator.generate_key('casino two factor signing v1', 32)
-    ActiveSupport::MessageEncryptor.new(encryption_key, signing_key, digest: 'SHA256',
-                                       serializer: ActiveSupport::MessageEncryptor::NullSerializer)
+    secret_base = configured_two_factor_secret_key
+    return @secret_encryptor if @secret_encryptor && @secret_encryptor_base == secret_base
+
+    key_generator  = ActiveSupport::CachingKeyGenerator.new(ActiveSupport::KeyGenerator.new(secret_base))
+    encryption_key = key_generator.generate_key(ENCRYPTION_SALT, KEY_LENGTH)
+    signing_key    = key_generator.generate_key(SIGNING_SALT, KEY_LENGTH)
+
+    @secret_encryptor_base = secret_base
+    @secret_encryptor = ActiveSupport::MessageEncryptor.new(
+      encryption_key,
+      signing_key,
+      cipher: 'aes-256-cbc',
+      digest: 'SHA256',
+      serializer: ActiveSupport::MessageEncryptor::NullSerializer
+    )
+  end
+
+  def self.configured_two_factor_secret_key
+    secret = if Rails.application
+                Rails.application.secrets.try(:two_factor_secret_key).presence ||  ENV['CASINO_API_TOKEN']
+             end
+
+    secret || raise(ArgumentError, 'two_factor_secret_key must be configured')
   end
 
   def self.cleanup
